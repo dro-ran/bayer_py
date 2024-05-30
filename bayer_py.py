@@ -38,15 +38,27 @@ def raw_process(image_path, config_json):
         raw_nda = np.array(raw_nda, dtype=np.uint16)
 
         # reshape to image width and height
-        raw_nda = np.frombuffer(raw_nda, np.uint16).reshape(config_json['height'], config_json['width'])
+        raw_nda = raw_nda.reshape(config_json['height'], config_json['width'])
 
         # demosaic to BGR image
         img_bgr = cv2.cvtColor(raw_nda, cv2.COLOR_BAYER_BGGR2BGR)
-        # img_gray = cv2.cvtColor(img, cv2.COLOR_BAYER_BGGR2GRAY)
+        img_gray = cv2.cvtColor(raw_nda, cv2.COLOR_BAYER_BGGR2GRAY)
+
+        # Gray [4096] -> BGR [4096, 4096, 4096]
+        img_gray = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2BGR)
+
+        # BGR [4096, 4096, 4096] -> R only [0, 0, 4096]
+        img_gray[::2, ::2, (0, 1)] = 0      # R
+        img_gray[::2, 1::2, (0, 2)] = 0     # Gr
+        img_gray[1::2, ::2, (0, 2)] = 0     # Gb
+        img_gray[1::2, 1::2, (1, 2)] = 0    # B
 
         # resizable window
         cv2.namedWindow('demosaic', cv2.WINDOW_NORMAL)
+        cv2.namedWindow('mosaic', cv2.WINDOW_NORMAL)
+
         cv2.imshow('demosaic', img_bgr)
+        cv2.imshow('mosaic', img_gray)
         cv2.waitKey()
         cv2.destroyAllWindows()
 
