@@ -4,5 +4,9 @@
     "height": 3040,
     "black_level": 4096,
     "bayer_pattern": "BGGR",
-    "dgain": 2
+    "b_dgain": 1.0,
+    "gb_dgain": 0.5,
+    "gr_dgain": 0.5,
+    "r_dgain": 1.0,
+    "post_dgain": 4.0
 }
